@@ -197,7 +197,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
         gap={{ xs: 1, md: 2 }}
         sx={{
           backgroundColor: 'rgba(99, 102, 241, 0.02)',
-          flexDirection: { xs: 'row', sm: 'row' },
+          flexDirection: 'row',
         }}
       >
         <Box
@@ -431,7 +431,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                p: { xs: 1.5, md: 1.5 },
+                p: 1.5,
                 backgroundColor: 'rgba(99, 102, 241, 0.04)',
                 borderRadius: 2,
               }}

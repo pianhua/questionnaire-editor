@@ -321,8 +321,7 @@ const QuestionnaireEditor: React.FC = () => {
                       height: { xs: '85vh', md: 'auto' },
                       overflow: 'auto',
                       width: { xs: '100%', md: 'auto' },
-                      m: { xs: 0, md: 0 },
-                      mt: { md: 0 },
+                    m: 0,
                     }}
                   >
                     <Box 
@@ -368,7 +367,7 @@ const QuestionnaireEditor: React.FC = () => {
                         mt={2} 
                         display="flex" 
                         gap={1}
-                        sx={{ display: { xs: 'flex', md: 'flex' } }}
+                        sx={{ display: 'flex' }}
                       >
                         <Button
                           variant="outlined"
