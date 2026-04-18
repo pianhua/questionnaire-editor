@@ -177,7 +177,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
         opacity: isDragging ? 0.5 : 1,
         cursor: isDragging ? 'grabbing' : 'pointer',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        borderRadius: 3,
+        borderRadius: { xs: 2, md: 3 },
         overflow: 'hidden',
         boxShadow: isSelected
           ? '0 4px 20px rgba(99, 102, 241, 0.3)'
@@ -193,10 +193,11 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
       <Box
         display="flex"
         alignItems="center"
-        p={2}
-        gap={2}
+        p={{ xs: 1.5, md: 2 }}
+        gap={{ xs: 1, md: 2 }}
         sx={{
           backgroundColor: 'rgba(99, 102, 241, 0.02)',
+          flexDirection: { xs: 'row', sm: 'row' },
         }}
       >
         <Box
@@ -206,8 +207,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 48,
-            height: 48,
+            width: { xs: 40, md: 48 },
+            height: { xs: 40, md: 48 },
             borderRadius: 2,
             backgroundColor: 'rgba(99, 102, 241, 0.08)',
             '&:hover': {
@@ -216,28 +217,35 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             '&:active': {
               cursor: 'grabbing',
             },
+            flexShrink: 0,
           }}
         >
-          <DragIcon sx={{ color: 'text.secondary', fontSize: 24 }} />
+          <DragIcon sx={{ color: 'text.secondary', fontSize: { xs: 20, md: 24 } }} />
         </Box>
 
         <Box
           sx={{
-            width: 8,
-            height: 40,
+            width: { xs: 6, md: 8 },
+            height: { xs: 36, md: 40 },
             borderRadius: 4,
             background: `linear-gradient(135deg, ${typeColors[question.type]} 0%, ${typeColors[question.type]}99 100%)`,
+            flexShrink: 0,
           }}
         />
 
-        <Box sx={{ flex: 1 }}>
-          <Box display="flex" alignItems="center" gap={1.5}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box 
+            display="flex" 
+            alignItems="center" 
+            gap={1}
+            sx={{ flexWrap: 'wrap' }}
+          >
             <Typography
               variant="subtitle2"
               sx={{
                 color: typeColors[question.type],
                 fontWeight: 600,
-                fontSize: '0.8rem',
+                fontSize: { xs: '0.7rem', md: '0.8rem' },
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}
@@ -249,8 +257,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
                 label="必填"
                 size="small"
                 sx={{
-                  height: 20,
-                  fontSize: '0.7rem',
+                  height: { xs: 18, md: 20 },
+                  fontSize: { xs: '0.65rem', md: '0.7rem' },
                   fontWeight: 600,
                   backgroundColor: 'rgba(239, 68, 68, 0.1)',
                   color: 'error.main',
@@ -265,6 +273,10 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
               color: question.title ? 'text.primary' : 'error.main',
               fontWeight: 500,
               mt: 0.5,
+              fontSize: { xs: '0.85rem', md: '0.875rem' },
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: { xs: 'nowrap', md: 'normal' },
             }}
           >
             {question.title || '（未填写问题标题）'}
@@ -276,6 +288,10 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
                 color: 'text.secondary',
                 display: 'block',
                 mt: 0.5,
+                fontSize: { xs: '0.65rem', md: '0.75rem' },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: { xs: 'nowrap', md: 'normal' },
               }}
             >
               {optionsPreview}
@@ -283,13 +299,18 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
           )}
         </Box>
 
-        <Box display="flex" alignItems="center" gap={1}>
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          gap={0.5}
+          sx={{ flexShrink: 0 }}
+        >
           <Chip
             label={`#${index + 1}`}
             size="small"
             sx={{
-              height: 24,
-              fontSize: '0.75rem',
+              height: { xs: 22, md: 24 },
+              fontSize: { xs: '0.7rem', md: '0.75rem' },
               fontWeight: 600,
               backgroundColor: 'rgba(99, 102, 241, 0.1)',
               color: 'primary.main',
@@ -300,8 +321,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             size="medium"
             onClick={handleToggleExpand}
             sx={{
-              width: 48,
-              height: 48,
+              width: { xs: 40, md: 48 },
+              height: { xs: 40, md: 48 },
               backgroundColor: expanded ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
               borderRadius: 2,
               '&:hover': {
@@ -316,8 +337,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             size="medium"
             onClick={handleMenuOpen}
             sx={{
-              width: 48,
-              height: 48,
+              width: { xs: 40, md: 48 },
+              height: { xs: 40, md: 48 },
               backgroundColor: 'rgba(99, 102, 241, 0.08)',
               borderRadius: 2,
               '&:hover': {
@@ -377,8 +398,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
 
       <Collapse in={expanded}>
         <Box
-          px={3}
-          pb={3}
+          px={{ xs: 2, md: 3 }}
+          pb={{ xs: 2, md: 3 }}
           sx={{
             backgroundColor: 'white',
           }}
@@ -392,7 +413,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
               size="small"
               error={Boolean(titleError)}
               helperText={titleError}
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, '& .MuiInputBase-input': { minHeight: 48, py: 1.5 } }}
             />
 
             <TextField
@@ -401,7 +422,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
               value={question.description || ''}
               onChange={(e) => handleDescriptionChange(e.target.value)}
               size="small"
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, '& .MuiInputBase-input': { minHeight: 48, py: 1.5 } }}
               placeholder="添加更多说明或指引..."
             />
 
@@ -410,7 +431,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                p: 1.5,
+                p: { xs: 1.5, md: 1.5 },
                 backgroundColor: 'rgba(99, 102, 241, 0.04)',
                 borderRadius: 2,
               }}

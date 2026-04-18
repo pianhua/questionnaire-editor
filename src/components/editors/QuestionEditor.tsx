@@ -43,8 +43,17 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
+    <Paper 
+      elevation={2} 
+      sx={{ 
+        p: { xs: 2, md: 3 },
+        borderRadius: { xs: 2, md: 3 },
+        '& .MuiInputBase-input': { minHeight: 48 },
+        '& .MuiSelect-select': { minHeight: 48 },
+        '& .MuiButton-root': { minHeight: 48 }
+      }}
+    >
+      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
         问题设置
       </Typography>
       <Divider sx={{ mb: 2 }} />

@@ -201,17 +201,31 @@ const QuestionnaireEditor: React.FC = () => {
     switch (currentView) {
       case 'questions':
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={editingQuestion ? 8 : 12}>
+          <Grid container spacing={{ xs: 2, md: 3 }} sx={{ overflowX: 'hidden' }}>
+            <Grid item xs={12} md={editingQuestion ? 8 : 12} sx={{ pr: { md: 2 } }}>
               <Paper
                 elevation={0}
                 className="paper-container"
-                sx={{ p: 3, maxHeight: 'calc(100vh - 220px)', overflow: 'auto' }}
+                sx={{ 
+                  p: { xs: 2, md: 3 }, 
+                  maxHeight: { xs: 'calc(100vh - 280px)', md: 'calc(100vh - 220px)' }, 
+                  overflow: 'auto',
+                  borderRadius: { xs: 2, md: 3 }
+                }}
                 ref={editorRef}
               >
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Box 
+                  display="flex" 
+                  justifyContent="space-between" 
+                  alignItems="center" 
+                  mb={3}
+                  sx={{
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 2, sm: 0 }
+                  }}
+                >
                   <Box display="flex" alignItems="center" gap={2}>
-                    <Typography variant="h6" fontWeight={600}>
+                    <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                       问卷问题
                     </Typography>
                     <Chip
@@ -230,7 +244,9 @@ const QuestionnaireEditor: React.FC = () => {
                     onClick={() => setShowQuestionTypeSelector(true)}
                     sx={{
                       borderRadius: 3,
-                      px: 3,
+                      px: { xs: 2, md: 3 },
+                      minHeight: 48,
+                      width: { xs: '100%', sm: 'auto' },
                     }}
                   >
                     添加问题
@@ -292,28 +308,55 @@ const QuestionnaireEditor: React.FC = () => {
                 <Fade in timeout={300}>
                   <Box
                     sx={{
-                      position: isMobile ? 'fixed' : 'static',
-                      bottom: isMobile ? 0 : 'auto',
-                      left: isMobile ? 0 : 'auto',
-                      right: isMobile ? 0 : 'auto',
-                      zIndex: isMobile ? 1000 : 'auto',
+                      position: { xs: 'fixed', md: 'static' },
+                      bottom: { xs: 0, md: 'auto' },
+                      left: { xs: 0, md: 'auto' },
+                      right: { xs: 0, md: 'auto' },
+                      top: { xs: 0, md: 'auto' },
+                      zIndex: { xs: 1000, md: 'auto' },
                       backgroundColor: 'background.paper',
-                      boxShadow: isMobile ? '0 -4px 20px rgba(0,0,0,0.1)' : 'none',
-                      borderRadius: isMobile ? '16px 16px 0 0' : '8px',
-                      maxHeight: isMobile ? '70vh' : 'auto',
+                      boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.1)', md: '0 2px 12px rgba(0, 0, 0, 0.08)' },
+                      borderRadius: { xs: '16px 16px 0 0', md: 3 },
+                      maxHeight: { xs: '85vh', md: 'none' },
+                      height: { xs: '85vh', md: 'auto' },
                       overflow: 'auto',
+                      width: { xs: '100%', md: 'auto' },
+                      m: { xs: 0, md: 0 },
+                      mt: { md: 0 },
                     }}
                   >
-                    <Box sx={{ p: 3 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                        <Typography variant="h6" fontWeight={600}>
+                    <Box 
+                      sx={{ 
+                        p: { xs: 2, md: 3 },
+                        pb: { xs: 4, md: 3 }
+                      }}
+                    >
+                      <Box 
+                        display="flex" 
+                        justifyContent="space-between" 
+                        alignItems="center" 
+                        mb={3}
+                        sx={{
+                          position: { xs: 'sticky', md: 'static' },
+                          top: { xs: 0, md: 'auto' },
+                          backgroundColor: { xs: 'background.paper', md: 'transparent' },
+                          zIndex: 1,
+                          pb: { xs: 2, md: 0 },
+                          borderBottom: { xs: '1px solid', md: 'none', borderColor: 'divider' }
+                        }}
+                      >
+                        <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                           编辑问题
                         </Typography>
-                        {isMobile && (
-                          <IconButton onClick={() => setEditingQuestionId(null)}>
-                            <CloseIcon />
-                          </IconButton>
-                        )}
+                        <IconButton 
+                          onClick={() => setEditingQuestionId(null)}
+                          sx={{
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
                       </Box>
                       <QuestionEditor
                         question={editingQuestion}
@@ -321,12 +364,21 @@ const QuestionnaireEditor: React.FC = () => {
                           handleUpdateQuestion(q);
                         }}
                       />
-                      <Box mt={2} display="flex" gap={1}>
+                      <Box 
+                        mt={2} 
+                        display="flex" 
+                        gap={1}
+                        sx={{ display: { xs: 'flex', md: 'flex' } }}
+                      >
                         <Button
                           variant="outlined"
                           fullWidth
                           onClick={() => setEditingQuestionId(null)}
-                          sx={{ borderRadius: 3 }}
+                          sx={{ 
+                            borderRadius: 3,
+                            minHeight: 48,
+                            display: { xs: 'none', md: 'flex' }
+                          }}
                         >
                           关闭编辑
                         </Button>
@@ -646,47 +698,51 @@ const QuestionnaireEditor: React.FC = () => {
           </Box>
         </Drawer>
 
-        <Box sx={{ p: 3 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 3,
-              p: 3,
-              backgroundColor: 'rgba(99, 102, 241, 0.04)',
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'rgba(99, 102, 241, 0.1)',
+        <Box sx={{ 
+        p: { xs: 2, md: 3 },
+        maxWidth: '100%',
+        overflowX: 'hidden'
+      }}>
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 3,
+            p: { xs: 2, md: 3 },
+            backgroundColor: 'rgba(99, 102, 241, 0.04)',
+            borderRadius: { xs: 3, md: 4 },
+            border: '1px solid',
+            borderColor: 'rgba(99, 102, 241, 0.1)',
+          }}
+        >
+          <TextField
+            fullWidth
+            value={currentQuestionnaire.title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            variant="standard"
+            placeholder="问卷标题"
+            error={Boolean(titleError)}
+            helperText={titleError}
+            InputProps={{
+              disableUnderline: false,
+              sx: { fontSize: { xs: '1.2rem', md: '1.5rem' }, fontWeight: 'bold' },
             }}
-          >
-            <TextField
-              fullWidth
-              value={currentQuestionnaire.title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              variant="standard"
-              placeholder="问卷标题"
-              error={Boolean(titleError)}
-              helperText={titleError}
-              InputProps={{
-                disableUnderline: false,
-                sx: { fontSize: '1.5rem', fontWeight: 'bold' },
-              }}
-              sx={{ mb: 1 }}
-            />
-            <TextField
-              fullWidth
-              value={currentQuestionnaire.description || ''}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              variant="standard"
-              placeholder="问卷描述（可选）"
-              InputProps={{
-                disableUnderline: false,
-                sx: { color: 'text.secondary' },
-              }}
-            />
-          </Paper>
+            sx={{ mb: 1, '& .MuiInputBase-input': { px: { xs: 1, md: 0 } } }}
+          />
+          <TextField
+            fullWidth
+            value={currentQuestionnaire.description || ''}
+            onChange={(e) => handleDescriptionChange(e.target.value)}
+            variant="standard"
+            placeholder="问卷描述（可选）"
+            InputProps={{
+              disableUnderline: false,
+              sx: { color: 'text.secondary' },
+            }}
+          />
+        </Paper>
 
-          {renderContent()}
-        </Box>
+        {renderContent()}
+      </Box>
 
         <Dialog
           open={showQuestionTypeSelector}
