@@ -193,8 +193,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
       <Box
         display="flex"
         alignItems="center"
-        p={{ xs: 1.5, md: 2 }}
-        gap={{ xs: 1, md: 2 }}
+        p={{ xs: 1.2, md: 2 }}
+        gap={{ xs: 0.75, md: 2 }}
         sx={{
           backgroundColor: 'rgba(99, 102, 241, 0.02)',
           flexDirection: 'row',
@@ -207,8 +207,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: { xs: 40, md: 48 },
-            height: { xs: 40, md: 48 },
+            width: { xs: 36, md: 48 },
+            height: { xs: 36, md: 48 },
             borderRadius: 2,
             backgroundColor: 'rgba(99, 102, 241, 0.08)',
             '&:hover': {
@@ -220,13 +220,13 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             flexShrink: 0,
           }}
         >
-          <DragIcon sx={{ color: 'text.secondary', fontSize: { xs: 20, md: 24 } }} />
+          <DragIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, md: 24 } }} />
         </Box>
 
         <Box
           sx={{
-            width: { xs: 6, md: 8 },
-            height: { xs: 36, md: 40 },
+            width: { xs: 4, md: 8 },
+            height: { xs: 32, md: 40 },
             borderRadius: 4,
             background: `linear-gradient(135deg, ${typeColors[question.type]} 0%, ${typeColors[question.type]}99 100%)`,
             flexShrink: 0,

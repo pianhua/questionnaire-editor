@@ -207,8 +207,8 @@ const QuestionnaireEditor: React.FC = () => {
                 elevation={0}
                 className="paper-container"
                 sx={{ 
-                  p: { xs: 2, md: 3 }, 
-                  maxHeight: { xs: 'calc(100vh - 280px)', md: 'calc(100vh - 220px)' }, 
+                  p: { xs: 1.5, md: 3 }, 
+                  maxHeight: { xs: 'calc(100vh - 240px)', md: 'calc(100vh - 220px)' }, 
                   overflow: 'auto',
                   borderRadius: { xs: 2, md: 3 }
                 }}

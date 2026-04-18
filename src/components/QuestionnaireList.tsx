@@ -125,23 +125,44 @@ const QuestionnaireList: React.FC = () => {
   if (showTemplates) {
     return (
       <Box className="paper-container" sx={{ p: 4 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} className="gradient-text">
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          mb={4}
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 0 },
+            textAlign: { xs: 'center', sm: 'left' }
+          }}
+        >
+          <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Typography variant="h4" fontWeight={700} className="gradient-text" sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }}>
               模板库
             </Typography>
             <Typography variant="body1" color="text.secondary" mt={1}>
               从预设模板快速创建问卷
             </Typography>
           </Box>
-          <Box display="flex" gap={2}>
+          <Box 
+            display="flex" 
+            gap={1.5}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', sm: 'flex-end' }
+            }}
+          >
             <Button
               variant="outlined"
               startIcon={<LibraryIcon />}
               onClick={() => setShowTemplates(false)}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               返回列表
@@ -152,7 +173,10 @@ const QuestionnaireList: React.FC = () => {
               onClick={() => setOpenImport(true)}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               导入问卷
@@ -163,7 +187,10 @@ const QuestionnaireList: React.FC = () => {
               onClick={handleClickOpen}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               创建问卷
@@ -182,23 +209,44 @@ const QuestionnaireList: React.FC = () => {
         className="paper-container"
         sx={{ p: 4 }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} className="gradient-text">
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          mb={4}
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 0 },
+            textAlign: { xs: 'center', sm: 'left' }
+          }}
+        >
+          <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Typography variant="h4" fontWeight={700} className="gradient-text" sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }}>
               我的问卷
             </Typography>
             <Typography variant="body1" color="text.secondary" mt={1}>
               创建和管理您的问卷
             </Typography>
           </Box>
-          <Box display="flex" gap={2}>
+          <Box 
+            display="flex" 
+            gap={1.5}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', sm: 'flex-end' }
+            }}
+          >
             <Button
               variant="outlined"
               startIcon={<LibraryIcon />}
               onClick={() => setShowTemplates(true)}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               模板库
@@ -209,7 +257,10 @@ const QuestionnaireList: React.FC = () => {
               onClick={() => setOpenImport(true)}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               导入问卷
@@ -220,7 +271,10 @@ const QuestionnaireList: React.FC = () => {
               onClick={handleClickOpen}
               sx={{
                 borderRadius: 3,
-                px: 3,
+                px: { xs: 2, md: 3 },
+                minHeight: 44,
+                flex: { xs: 1, sm: 'auto' },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
               }}
             >
               创建问卷
