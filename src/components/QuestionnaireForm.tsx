@@ -194,30 +194,32 @@ const QuestionItem: React.FC<QuestionFormProps> = ({ question, index, onAnswerCh
 
       case QuestionType.MATRIX:
         return (
-          <Box>
-            <Box display="flex" gap={2} mb={1}>
-              <Box sx={{ width: 150 }} />
-              {question.columns.map((col: Option) => (
-                <Typography key={col.id} variant="caption" sx={{ flex: 1, textAlign: 'center' }}>
-                  {col.text}
-                </Typography>
-              ))}
-            </Box>
-            {question.rows.map((row: Option) => (
-              <Box key={row.id} display="flex" gap={2} alignItems="center" mb={1}>
-                <Typography variant="body2" sx={{ width: 150, flexShrink: 0 }}>
-                  {row.text}
-                </Typography>
+          <Box sx={{ overflowX: 'auto', my: 2 }}>
+            <Box sx={{ minWidth: 'max-content' }}>
+              <Box display="flex" gap={2} mb={1}>
+                <Box sx={{ width: 150 }} />
                 {question.columns.map((col: Option) => (
-                  <Radio
-                    key={`${row.id}-${col.id}`}
-                    sx={{ flex: 1 }}
-                    checked={matrixValues[row.id] === col.id}
-                    onChange={() => handleMatrixChange(row.id, col.id)}
-                  />
+                  <Typography key={col.id} variant="caption" sx={{ flex: 1, textAlign: 'center', minWidth: 80 }}>
+                    {col.text}
+                  </Typography>
                 ))}
               </Box>
-            ))}
+              {question.rows.map((row: Option) => (
+                <Box key={row.id} display="flex" gap={2} alignItems="center" mb={1}>
+                  <Typography variant="body2" sx={{ width: 150, flexShrink: 0 }}>
+                    {row.text}
+                  </Typography>
+                  {question.columns.map((col: Option) => (
+                    <Radio
+                      key={`${row.id}-${col.id}`}
+                      sx={{ flex: 1, minWidth: 80 }}
+                      checked={matrixValues[row.id] === col.id}
+                      onChange={() => handleMatrixChange(row.id, col.id)}
+                    />
+                  ))}
+                </Box>
+              ))}
+            </Box>
           </Box>
         );
 
