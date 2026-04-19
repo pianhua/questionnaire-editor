@@ -224,7 +224,7 @@ const QuestionnaireEditor: React.FC = () => {
                     gap: { xs: 2, sm: 0 }
                   }}
                 >
-                  <Box display="flex" alignItems="center" gap={2}>
+                  <Box display="flex" alignItems="center" gap={2} sx={{ flexWrap: 'wrap' }}>
                     <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                       问卷问题
                     </Typography>

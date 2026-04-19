@@ -412,7 +412,7 @@ const QuestionnaireList: React.FC = () => {
                           sx={{ borderRadius: 1.5, height: 24 }}
                         />
                         {questionnaire.description && (
-                          <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 200 }} component="span">
+                          <Typography variant="caption" color="text.secondary" sx={{ maxWidth: { xs: 120, sm: 200 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} component="span">
                             {questionnaire.description}
                           </Typography>
                         )}
