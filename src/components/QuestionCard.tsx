@@ -276,7 +276,8 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
               fontSize: { xs: '0.85rem', md: '0.875rem' },
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: { xs: 'nowrap', md: 'normal' },
+              whiteSpace: 'normal',
+              wordBreak: 'break-word'
             }}
           >
             {question.title || '（未填写问题标题）'}

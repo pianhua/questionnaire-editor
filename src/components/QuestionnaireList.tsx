@@ -150,7 +150,12 @@ const QuestionnaireList: React.FC = () => {
             sx={{
               width: { xs: '100%', sm: 'auto' },
               flexWrap: 'wrap',
-              justifyContent: { xs: 'center', sm: 'flex-end' }
+              justifyContent: { xs: 'center', sm: 'flex-end' },
+              '& > button': {
+                flex: { xs: 1, sm: 'auto' },
+                minWidth: { xs: 'auto', sm: 120 },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
+              }
             }}
           >
             <Button
@@ -234,7 +239,12 @@ const QuestionnaireList: React.FC = () => {
             sx={{
               width: { xs: '100%', sm: 'auto' },
               flexWrap: 'wrap',
-              justifyContent: { xs: 'center', sm: 'flex-end' }
+              justifyContent: { xs: 'center', sm: 'flex-end' },
+              '& > button': {
+                flex: { xs: 1, sm: 'auto' },
+                minWidth: { xs: 'auto', sm: 120 },
+                fontSize: { xs: '0.85rem', md: '0.9rem' }
+              }
             }}
           >
             <Button
@@ -397,7 +407,7 @@ const QuestionnaireList: React.FC = () => {
                   }
                   secondary={
                     <Box mt={1.5} component="div" display="block">
-                      <Typography variant="caption" color="text.secondary" component="span" display="block">
+                      <Typography variant="caption" color="text.primary" component="span" display="block" sx={{ fontWeight: 400, opacity: 0.7 }}>
                         创建于 {new Date(questionnaire.createdAt).toLocaleDateString('zh-CN', {
                           year: 'numeric',
                           month: 'long',

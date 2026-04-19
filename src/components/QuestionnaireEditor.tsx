@@ -210,7 +210,7 @@ const QuestionnaireEditor: React.FC = () => {
                   p: { xs: 1.5, md: 3 }, 
                   maxHeight: { xs: 'calc(100vh - 240px)', md: 'calc(100vh - 220px)' }, 
                   overflow: 'auto',
-                  borderRadius: { xs: 2, md: 3 }
+                  borderRadius: 3
                 }}
                 ref={editorRef}
               >
@@ -708,7 +708,7 @@ const QuestionnaireEditor: React.FC = () => {
             mb: 3,
             p: { xs: 2, md: 3 },
             backgroundColor: 'rgba(99, 102, 241, 0.04)',
-            borderRadius: { xs: 3, md: 4 },
+            borderRadius: 3,
             border: '1px solid',
             borderColor: 'rgba(99, 102, 241, 0.1)',
           }}
@@ -723,7 +723,12 @@ const QuestionnaireEditor: React.FC = () => {
             helperText={titleError}
             InputProps={{
               disableUnderline: false,
-              sx: { fontSize: { xs: '1.2rem', md: '1.5rem' }, fontWeight: 'bold' },
+              sx: { 
+                fontSize: { xs: '1.2rem', md: '1.5rem' }, 
+                fontWeight: 'bold',
+                whiteSpace: 'normal',
+                wordBreak: 'break-word'
+              },
             }}
             sx={{ mb: 1, '& .MuiInputBase-input': { px: { xs: 1, md: 0 } } }}
           />
