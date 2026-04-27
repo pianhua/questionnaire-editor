@@ -33,6 +33,9 @@ import {
   Fade,
   Tooltip,
   Alert,
+  Snackbar,
+  BottomNavigation,
+  BottomNavigationAction,
   Drawer,
   List,
   ListItem,
@@ -68,9 +71,12 @@ import AnalysisPanel from './AnalysisPanel';
 import AIGeneratePanel from './AIGeneratePanel';
 import APIConfigDialog from './APIConfigDialog';
 import { exportQuestionnaire } from '../services/exportService';
+import { StorageService } from '../services/storageService';
 import { validateQuestionnaireTitle } from '../utils/validation';
 
 type EditorView = 'questions' | 'settings' | 'preview' | 'publish' | 'analysis' | 'form';
+type MobileNavValue = 'questions' | 'preview' | 'form' | 'settings' | 'ai';
+const storageService = new StorageService();
 
 const QuestionnaireEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -92,7 +98,11 @@ const QuestionnaireEditor: React.FC = () => {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'questionnaire' | 'editor'>('questionnaire');
   const [titleError, setTitleError] = useState<string>('');
+  const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const saveTimeoutRef = useRef<number | null>(null);
+  const isFirstSaveEffect = useRef(true);
+  const hasPendingSave = useRef(false);
 
   if (!currentQuestionnaire) {
     return (
@@ -174,6 +184,15 @@ const QuestionnaireEditor: React.FC = () => {
     setMobileOpen(false);
   }, []);
 
+  const handleMobileBottomNavChange = useCallback((value: MobileNavValue) => {
+    if (value === 'ai') {
+      setShowAIPanel(true);
+      return;
+    }
+
+    setCurrentView(value);
+  }, []);
+
   // 使用 useMemo 优化 editingQuestion 计算
   const editingQuestion = useMemo(() => {
     return editingQuestionId
@@ -197,6 +216,46 @@ const QuestionnaireEditor: React.FC = () => {
     }
   }, [editingQuestionId]);
 
+  useEffect(() => {
+    if (isFirstSaveEffect.current) {
+      isFirstSaveEffect.current = false;
+      return;
+    }
+
+    hasPendingSave.current = true;
+
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = window.setTimeout(() => {
+      storageService.saveQuestionnaires(questionnaires);
+      hasPendingSave.current = false;
+      setShowAutoSaveNotice(true);
+      saveTimeoutRef.current = null;
+    }, 500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [questionnaires]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasPendingSave.current) {
+        storageService.saveQuestionnaires(questionnaires);
+        hasPendingSave.current = false;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [questionnaires]);
+
   const renderContent = () => {
     switch (currentView) {
       case 'questions':
@@ -208,7 +267,7 @@ const QuestionnaireEditor: React.FC = () => {
                 className="paper-container"
                 sx={{ 
                   p: { xs: 1.5, md: 3 }, 
-                  maxHeight: { xs: 'calc(100vh - 240px)', md: 'calc(100vh - 220px)' }, 
+                  maxHeight: { xs: 'none', md: 'calc(100vh - 220px)' }, 
                   overflow: 'auto',
                   borderRadius: 3
                 }}
@@ -491,7 +550,16 @@ const QuestionnaireEditor: React.FC = () => {
                 <BackIcon />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ flex: 1, fontWeight: 600 }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                flex: 1,
+                fontWeight: 600,
+                fontSize: { xs: '0.95rem', md: '1.25rem' },
+                pr: 1,
+              }}
+            >
               {(currentView === 'preview' || currentView === 'form') ? `${currentQuestionnaire.title} - ${currentView === 'preview' ? '预览' : '填写'}` : currentQuestionnaire.title}
             </Typography>
             {isMobile ? (
@@ -699,6 +767,7 @@ const QuestionnaireEditor: React.FC = () => {
 
         <Box sx={{ 
         p: { xs: 2, md: 3 },
+        pb: { xs: 10, md: 3 },
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
@@ -747,6 +816,34 @@ const QuestionnaireEditor: React.FC = () => {
 
         {renderContent()}
       </Box>
+
+      {isMobile && !editingQuestion && (
+        <Paper
+          elevation={8}
+          sx={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            zIndex: 1200,
+            pb: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          <BottomNavigation
+            showLabels
+            value={currentView}
+            onChange={(_, value: MobileNavValue) => handleMobileBottomNavChange(value)}
+          >
+            <BottomNavigationAction label="编辑" value="questions" icon={<AddIcon />} />
+            <BottomNavigationAction label="预览" value="preview" icon={<PreviewIcon />} />
+            <BottomNavigationAction label="填写" value="form" icon={<EditIcon />} />
+            <BottomNavigationAction label="AI" value="ai" icon={<AIIcon />} />
+            <BottomNavigationAction label="设置" value="settings" icon={<SettingsIcon />} />
+          </BottomNavigation>
+        </Paper>
+      )}
 
         <Dialog
           open={showQuestionTypeSelector}
@@ -801,10 +898,26 @@ const QuestionnaireEditor: React.FC = () => {
         />
 
         {/* API配置对话框 */}
-        <APIConfigDialog
-          open={showAPIConfig}
-          onClose={() => setShowAPIConfig(false)}
-        />
+      <APIConfigDialog
+        open={showAPIConfig}
+        onClose={() => setShowAPIConfig(false)}
+      />
+
+      <Snackbar
+        open={showAutoSaveNotice}
+        autoHideDuration={1500}
+        onClose={() => setShowAutoSaveNotice(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowAutoSaveNotice(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          已自动保存
+        </Alert>
+      </Snackbar>
 
         {/* 导出对话框 */}
         <Dialog
