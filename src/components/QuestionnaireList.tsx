@@ -61,9 +61,7 @@ const QuestionnaireList: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (questionnaires.length > 0) {
-      storageService.saveQuestionnaires(questionnaires);
-    }
+    storageService.saveQuestionnaires(questionnaires);
   }, [questionnaires]);
 
   const handleClickOpen = () => {

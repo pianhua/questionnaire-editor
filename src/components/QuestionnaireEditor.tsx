@@ -33,9 +33,11 @@ import {
   Fade,
   Tooltip,
   Alert,
+  Snackbar,
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   useMediaQuery,
@@ -68,9 +70,11 @@ import AnalysisPanel from './AnalysisPanel';
 import AIGeneratePanel from './AIGeneratePanel';
 import APIConfigDialog from './APIConfigDialog';
 import { exportQuestionnaire } from '../services/exportService';
+import { StorageService } from '../services/storageService';
 import { validateQuestionnaireTitle } from '../utils/validation';
 
 type EditorView = 'questions' | 'settings' | 'preview' | 'publish' | 'analysis' | 'form';
+const storageService = new StorageService();
 
 const QuestionnaireEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -92,7 +96,11 @@ const QuestionnaireEditor: React.FC = () => {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'questionnaire' | 'editor'>('questionnaire');
   const [titleError, setTitleError] = useState<string>('');
+  const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const saveTimeoutRef = useRef<number | null>(null);
+  const isFirstSaveEffect = useRef(true);
+  const hasPendingSave = useRef(false);
 
   if (!currentQuestionnaire) {
     return (
@@ -174,6 +182,11 @@ const QuestionnaireEditor: React.FC = () => {
     setMobileOpen(false);
   }, []);
 
+  const handleQuickAction = useCallback((view: EditorView) => {
+    setCurrentView(view);
+    setMobileOpen(false);
+  }, []);
+
   // 使用 useMemo 优化 editingQuestion 计算
   const editingQuestion = useMemo(() => {
     return editingQuestionId
@@ -197,6 +210,46 @@ const QuestionnaireEditor: React.FC = () => {
     }
   }, [editingQuestionId]);
 
+  useEffect(() => {
+    if (isFirstSaveEffect.current) {
+      isFirstSaveEffect.current = false;
+      return;
+    }
+
+    hasPendingSave.current = true;
+
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = window.setTimeout(() => {
+      storageService.saveQuestionnaires(questionnaires);
+      hasPendingSave.current = false;
+      setShowAutoSaveNotice(true);
+      saveTimeoutRef.current = null;
+    }, 500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [questionnaires]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasPendingSave.current) {
+        storageService.saveQuestionnaires(questionnaires);
+        hasPendingSave.current = false;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [questionnaires]);
+
   const renderContent = () => {
     switch (currentView) {
       case 'questions':
@@ -208,7 +261,7 @@ const QuestionnaireEditor: React.FC = () => {
                 className="paper-container"
                 sx={{ 
                   p: { xs: 1.5, md: 3 }, 
-                  maxHeight: { xs: 'calc(100vh - 240px)', md: 'calc(100vh - 220px)' }, 
+                  maxHeight: { xs: 'none', md: 'calc(100vh - 220px)' }, 
                   overflow: 'auto',
                   borderRadius: 3
                 }}
@@ -303,56 +356,27 @@ const QuestionnaireEditor: React.FC = () => {
               </Paper>
             </Grid>
 
-            {editingQuestion && (
+            {editingQuestion && !isMobile && (
               <Grid item xs={12} md={4}>
                 <Fade in timeout={300}>
                   <Box
                     sx={{
-                      position: { xs: 'fixed', md: 'static' },
-                      bottom: { xs: 0, md: 'auto' },
-                      left: { xs: 0, md: 'auto' },
-                      right: { xs: 0, md: 'auto' },
-                      top: { xs: 0, md: 'auto' },
-                      zIndex: { xs: 1000, md: 'auto' },
+                      position: 'static',
                       backgroundColor: 'background.paper',
-                      boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.1)', md: '0 2px 12px rgba(0, 0, 0, 0.08)' },
-                      borderRadius: { xs: '16px 16px 0 0', md: 3 },
-                      maxHeight: { xs: '85vh', md: 'none' },
-                      height: { xs: '85vh', md: 'auto' },
+                      boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+                      borderRadius: 3,
                       overflow: 'auto',
-                      width: { xs: '100%', md: 'auto' },
-                    m: 0,
+                      m: 0,
                     }}
                   >
-                    <Box 
-                      sx={{ 
-                        p: { xs: 2, md: 3 },
-                        pb: { xs: 4, md: 3 }
-                      }}
-                    >
-                      <Box 
-                        display="flex" 
-                        justifyContent="space-between" 
-                        alignItems="center" 
-                        mb={3}
-                        sx={{
-                          position: { xs: 'sticky', md: 'static' },
-                          top: { xs: 0, md: 'auto' },
-                          backgroundColor: { xs: 'background.paper', md: 'transparent' },
-                          zIndex: 1,
-                          pb: { xs: 2, md: 0 },
-                          borderBottom: { xs: '1px solid', md: 'none', borderColor: 'divider' }
-                        }}
-                      >
-                        <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                    <Box sx={{ p: 3 }}>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Typography variant="h6" fontWeight={600}>
                           编辑问题
                         </Typography>
-                        <IconButton 
+                        <IconButton
                           onClick={() => setEditingQuestionId(null)}
-                          sx={{
-                            minWidth: 48,
-                            minHeight: 48,
-                          }}
+                          sx={{ minWidth: 48, minHeight: 48 }}
                         >
                           <CloseIcon />
                         </IconButton>
@@ -363,25 +387,6 @@ const QuestionnaireEditor: React.FC = () => {
                           handleUpdateQuestion(q);
                         }}
                       />
-                      <Box 
-                        mt={2} 
-                        display="flex" 
-                        gap={1}
-                        sx={{ display: 'flex' }}
-                      >
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          onClick={() => setEditingQuestionId(null)}
-                          sx={{ 
-                            borderRadius: 3,
-                            minHeight: 48,
-                            display: { xs: 'none', md: 'flex' }
-                          }}
-                        >
-                          关闭编辑
-                        </Button>
-                      </Box>
                     </Box>
                   </Box>
                 </Fade>
@@ -491,7 +496,16 @@ const QuestionnaireEditor: React.FC = () => {
                 <BackIcon />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ flex: 1, fontWeight: 600 }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                flex: 1,
+                fontWeight: 600,
+                fontSize: { xs: '0.95rem', md: '1.25rem' },
+                pr: 1,
+              }}
+            >
               {(currentView === 'preview' || currentView === 'form') ? `${currentQuestionnaire.title} - ${currentView === 'preview' ? '预览' : '填写'}` : currentQuestionnaire.title}
             </Typography>
             {isMobile ? (
@@ -616,6 +630,31 @@ const QuestionnaireEditor: React.FC = () => {
           </Toolbar>
         </AppBar>
 
+        {isMobile && (
+          <Box
+            sx={{
+              px: 1,
+              py: 1,
+              display: 'flex',
+              gap: 1,
+              overflowX: 'auto',
+              backgroundColor: 'background.paper',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              position: 'sticky',
+              top: 64,
+              zIndex: 999,
+            }}
+          >
+            <Button size="small" variant={currentView === 'questions' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('questions')}>编辑</Button>
+            <Button size="small" variant={currentView === 'preview' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('preview')}>预览</Button>
+            <Button size="small" variant={currentView === 'form' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('form')}>填写</Button>
+            <Button size="small" variant={currentView === 'settings' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('settings')}>设置</Button>
+            <Button size="small" variant="outlined" onClick={() => setShowAIPanel(true)}>AI</Button>
+            <Button size="small" variant="outlined" onClick={() => setShowExportDialog(true)}>导出</Button>
+          </Box>
+        )}
+
         {/* 移动端侧边栏导航 */}
         <Drawer
           anchor="right"
@@ -645,60 +684,77 @@ const QuestionnaireEditor: React.FC = () => {
               </IconButton>
             </Box>
             <List>
-              <ListItem button onClick={() => handleMobileViewChange('questions')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('questions')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AddIcon />
                 </ListItemIcon>
                 <ListItemText primary="编辑问题" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('preview')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('preview')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <PreviewIcon />
                 </ListItemIcon>
                 <ListItemText primary="预览" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('form')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('form')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <EditIcon />
                 </ListItemIcon>
                 <ListItemText primary="填写" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => setShowAIPanel(true)}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setShowAIPanel(true)}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AIIcon />
                 </ListItemIcon>
                 <ListItemText primary="AI生成" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('publish')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('publish')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <PublishIcon />
                 </ListItemIcon>
                 <ListItemText primary="发布" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('analysis')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('analysis')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AnalyticsIcon />
                 </ListItemIcon>
                 <ListItemText primary="分析" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => setShowExportDialog(true)}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setShowExportDialog(true)}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <DownloadIcon />
                 </ListItemIcon>
                 <ListItemText primary="导出" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('settings')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('settings')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <SettingsIcon />
                 </ListItemIcon>
                 <ListItemText primary="设置" />
+                </ListItemButton>
               </ListItem>
             </List>
           </Box>
         </Drawer>
 
         <Box sx={{ 
-        p: { xs: 2, md: 3 },
+        p: { xs: 1.25, md: 3 },
+        pb: { xs: 2, md: 3 },
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
@@ -747,6 +803,39 @@ const QuestionnaireEditor: React.FC = () => {
 
         {renderContent()}
       </Box>
+
+      {isMobile && editingQuestion && (
+        <Drawer
+          anchor="bottom"
+          open={Boolean(editingQuestion)}
+          onClose={() => setEditingQuestionId(null)}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              maxHeight: '86vh',
+            },
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h6" fontWeight={600}>编辑问题</Typography>
+              <IconButton onClick={() => setEditingQuestionId(null)} sx={{ minWidth: 44, minHeight: 44 }}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            {editingQuestion && (
+              <QuestionEditor
+                question={editingQuestion}
+                onChange={(q) => {
+                  handleUpdateQuestion(q);
+                }}
+              />
+            )}
+          </Box>
+        </Drawer>
+      )}
 
         <Dialog
           open={showQuestionTypeSelector}
@@ -801,10 +890,26 @@ const QuestionnaireEditor: React.FC = () => {
         />
 
         {/* API配置对话框 */}
-        <APIConfigDialog
-          open={showAPIConfig}
-          onClose={() => setShowAPIConfig(false)}
-        />
+      <APIConfigDialog
+        open={showAPIConfig}
+        onClose={() => setShowAPIConfig(false)}
+      />
+
+      <Snackbar
+        open={showAutoSaveNotice}
+        autoHideDuration={1500}
+        onClose={() => setShowAutoSaveNotice(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowAutoSaveNotice(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          已自动保存
+        </Alert>
+      </Snackbar>
 
         {/* 导出对话框 */}
         <Dialog
