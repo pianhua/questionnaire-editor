@@ -37,6 +37,7 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   useMediaQuery,
@@ -255,7 +256,7 @@ const QuestionnaireEditor: React.FC = () => {
                 className="paper-container"
                 sx={{ 
                   p: { xs: 1.5, md: 3 }, 
-                  maxHeight: { xs: 'calc(100vh - 240px)', md: 'calc(100vh - 220px)' }, 
+                  maxHeight: { xs: 'none', md: 'calc(100vh - 220px)' }, 
                   overflow: 'auto',
                   borderRadius: 3
                 }}
@@ -538,7 +539,16 @@ const QuestionnaireEditor: React.FC = () => {
                 <BackIcon />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ flex: 1, fontWeight: 600 }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                flex: 1,
+                fontWeight: 600,
+                fontSize: { xs: '0.95rem', md: '1.25rem' },
+                pr: 1,
+              }}
+            >
               {(currentView === 'preview' || currentView === 'form') ? `${currentQuestionnaire.title} - ${currentView === 'preview' ? '预览' : '填写'}` : currentQuestionnaire.title}
             </Typography>
             {isMobile ? (
@@ -692,53 +702,69 @@ const QuestionnaireEditor: React.FC = () => {
               </IconButton>
             </Box>
             <List>
-              <ListItem button onClick={() => handleMobileViewChange('questions')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('questions')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AddIcon />
                 </ListItemIcon>
                 <ListItemText primary="编辑问题" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('preview')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('preview')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <PreviewIcon />
                 </ListItemIcon>
                 <ListItemText primary="预览" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('form')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('form')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <EditIcon />
                 </ListItemIcon>
                 <ListItemText primary="填写" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => setShowAIPanel(true)}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setShowAIPanel(true)}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AIIcon />
                 </ListItemIcon>
                 <ListItemText primary="AI生成" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('publish')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('publish')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <PublishIcon />
                 </ListItemIcon>
                 <ListItemText primary="发布" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('analysis')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('analysis')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <AnalyticsIcon />
                 </ListItemIcon>
                 <ListItemText primary="分析" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => setShowExportDialog(true)}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setShowExportDialog(true)}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <DownloadIcon />
                 </ListItemIcon>
                 <ListItemText primary="导出" />
+                </ListItemButton>
               </ListItem>
-              <ListItem button onClick={() => handleMobileViewChange('settings')}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleMobileViewChange('settings')}>
                 <ListItemIcon sx={{ color: '#6366F1' }}>
                   <SettingsIcon />
                 </ListItemIcon>
                 <ListItemText primary="设置" />
+                </ListItemButton>
               </ListItem>
             </List>
           </Box>
@@ -746,6 +772,7 @@ const QuestionnaireEditor: React.FC = () => {
 
         <Box sx={{ 
         p: { xs: 2, md: 3 },
+        pb: { xs: 2, md: 3 },
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
