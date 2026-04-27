@@ -182,6 +182,11 @@ const QuestionnaireEditor: React.FC = () => {
     setMobileOpen(false);
   }, []);
 
+  const handleQuickAction = useCallback((view: EditorView) => {
+    setCurrentView(view);
+    setMobileOpen(false);
+  }, []);
+
   // 使用 useMemo 优化 editingQuestion 计算
   const editingQuestion = useMemo(() => {
     return editingQuestionId
@@ -351,56 +356,27 @@ const QuestionnaireEditor: React.FC = () => {
               </Paper>
             </Grid>
 
-            {editingQuestion && (
+            {editingQuestion && !isMobile && (
               <Grid item xs={12} md={4}>
                 <Fade in timeout={300}>
                   <Box
                     sx={{
-                      position: { xs: 'fixed', md: 'static' },
-                      bottom: { xs: 0, md: 'auto' },
-                      left: { xs: 0, md: 'auto' },
-                      right: { xs: 0, md: 'auto' },
-                      top: { xs: 0, md: 'auto' },
-                      zIndex: { xs: 1000, md: 'auto' },
+                      position: 'static',
                       backgroundColor: 'background.paper',
-                      boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.1)', md: '0 2px 12px rgba(0, 0, 0, 0.08)' },
-                      borderRadius: { xs: '16px 16px 0 0', md: 3 },
-                      maxHeight: { xs: '85vh', md: 'none' },
-                      height: { xs: '85vh', md: 'auto' },
+                      boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+                      borderRadius: 3,
                       overflow: 'auto',
-                      width: { xs: '100%', md: 'auto' },
-                    m: 0,
+                      m: 0,
                     }}
                   >
-                    <Box 
-                      sx={{ 
-                        p: { xs: 2, md: 3 },
-                        pb: { xs: 4, md: 3 }
-                      }}
-                    >
-                      <Box 
-                        display="flex" 
-                        justifyContent="space-between" 
-                        alignItems="center" 
-                        mb={3}
-                        sx={{
-                          position: { xs: 'sticky', md: 'static' },
-                          top: { xs: 0, md: 'auto' },
-                          backgroundColor: { xs: 'background.paper', md: 'transparent' },
-                          zIndex: 1,
-                          pb: { xs: 2, md: 0 },
-                          borderBottom: { xs: '1px solid', md: 'none', borderColor: 'divider' }
-                        }}
-                      >
-                        <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                    <Box sx={{ p: 3 }}>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Typography variant="h6" fontWeight={600}>
                           编辑问题
                         </Typography>
-                        <IconButton 
+                        <IconButton
                           onClick={() => setEditingQuestionId(null)}
-                          sx={{
-                            minWidth: 48,
-                            minHeight: 48,
-                          }}
+                          sx={{ minWidth: 48, minHeight: 48 }}
                         >
                           <CloseIcon />
                         </IconButton>
@@ -411,25 +387,6 @@ const QuestionnaireEditor: React.FC = () => {
                           handleUpdateQuestion(q);
                         }}
                       />
-                      <Box 
-                        mt={2} 
-                        display="flex" 
-                        gap={1}
-                        sx={{ display: 'flex' }}
-                      >
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          onClick={() => setEditingQuestionId(null)}
-                          sx={{ 
-                            borderRadius: 3,
-                            minHeight: 48,
-                            display: { xs: 'none', md: 'flex' }
-                          }}
-                        >
-                          关闭编辑
-                        </Button>
-                      </Box>
                     </Box>
                   </Box>
                 </Fade>
@@ -673,6 +630,31 @@ const QuestionnaireEditor: React.FC = () => {
           </Toolbar>
         </AppBar>
 
+        {isMobile && (
+          <Box
+            sx={{
+              px: 1,
+              py: 1,
+              display: 'flex',
+              gap: 1,
+              overflowX: 'auto',
+              backgroundColor: 'background.paper',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              position: 'sticky',
+              top: 64,
+              zIndex: 999,
+            }}
+          >
+            <Button size="small" variant={currentView === 'questions' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('questions')}>编辑</Button>
+            <Button size="small" variant={currentView === 'preview' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('preview')}>预览</Button>
+            <Button size="small" variant={currentView === 'form' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('form')}>填写</Button>
+            <Button size="small" variant={currentView === 'settings' ? 'contained' : 'outlined'} onClick={() => handleQuickAction('settings')}>设置</Button>
+            <Button size="small" variant="outlined" onClick={() => setShowAIPanel(true)}>AI</Button>
+            <Button size="small" variant="outlined" onClick={() => setShowExportDialog(true)}>导出</Button>
+          </Box>
+        )}
+
         {/* 移动端侧边栏导航 */}
         <Drawer
           anchor="right"
@@ -821,6 +803,39 @@ const QuestionnaireEditor: React.FC = () => {
 
         {renderContent()}
       </Box>
+
+      {isMobile && editingQuestion && (
+        <Drawer
+          anchor="bottom"
+          open={Boolean(editingQuestion)}
+          onClose={() => setEditingQuestionId(null)}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              maxHeight: '86vh',
+            },
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h6" fontWeight={600}>编辑问题</Typography>
+              <IconButton onClick={() => setEditingQuestionId(null)} sx={{ minWidth: 44, minHeight: 44 }}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            {editingQuestion && (
+              <QuestionEditor
+                question={editingQuestion}
+                onChange={(q) => {
+                  handleUpdateQuestion(q);
+                }}
+              />
+            )}
+          </Box>
+        </Drawer>
+      )}
 
         <Dialog
           open={showQuestionTypeSelector}
