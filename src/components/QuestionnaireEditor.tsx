@@ -753,7 +753,7 @@ const QuestionnaireEditor: React.FC = () => {
         </Drawer>
 
         <Box sx={{ 
-        p: { xs: 1.5, md: 3 },
+        p: { xs: 2, md: 3 },
         pb: { xs: 2, md: 3 },
         maxWidth: '100%',
         overflowX: 'hidden'
