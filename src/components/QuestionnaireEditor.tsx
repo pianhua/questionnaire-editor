@@ -33,6 +33,7 @@ import {
   Fade,
   Tooltip,
   Alert,
+  Snackbar,
   Drawer,
   List,
   ListItem,
@@ -68,9 +69,11 @@ import AnalysisPanel from './AnalysisPanel';
 import AIGeneratePanel from './AIGeneratePanel';
 import APIConfigDialog from './APIConfigDialog';
 import { exportQuestionnaire } from '../services/exportService';
+import { StorageService } from '../services/storageService';
 import { validateQuestionnaireTitle } from '../utils/validation';
 
 type EditorView = 'questions' | 'settings' | 'preview' | 'publish' | 'analysis' | 'form';
+const storageService = new StorageService();
 
 const QuestionnaireEditor: React.FC = () => {
   const dispatch = useDispatch();
@@ -92,7 +95,11 @@ const QuestionnaireEditor: React.FC = () => {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'questionnaire' | 'editor'>('questionnaire');
   const [titleError, setTitleError] = useState<string>('');
+  const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const saveTimeoutRef = useRef<number | null>(null);
+  const isFirstSaveEffect = useRef(true);
+  const hasPendingSave = useRef(false);
 
   if (!currentQuestionnaire) {
     return (
@@ -196,6 +203,46 @@ const QuestionnaireEditor: React.FC = () => {
       }
     }
   }, [editingQuestionId]);
+
+  useEffect(() => {
+    if (isFirstSaveEffect.current) {
+      isFirstSaveEffect.current = false;
+      return;
+    }
+
+    hasPendingSave.current = true;
+
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = window.setTimeout(() => {
+      storageService.saveQuestionnaires(questionnaires);
+      hasPendingSave.current = false;
+      setShowAutoSaveNotice(true);
+      saveTimeoutRef.current = null;
+    }, 500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [questionnaires]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasPendingSave.current) {
+        storageService.saveQuestionnaires(questionnaires);
+        hasPendingSave.current = false;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [questionnaires]);
 
   const renderContent = () => {
     switch (currentView) {
@@ -801,10 +848,26 @@ const QuestionnaireEditor: React.FC = () => {
         />
 
         {/* API配置对话框 */}
-        <APIConfigDialog
-          open={showAPIConfig}
-          onClose={() => setShowAPIConfig(false)}
-        />
+      <APIConfigDialog
+        open={showAPIConfig}
+        onClose={() => setShowAPIConfig(false)}
+      />
+
+      <Snackbar
+        open={showAutoSaveNotice}
+        autoHideDuration={1500}
+        onClose={() => setShowAutoSaveNotice(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowAutoSaveNotice(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          已自动保存
+        </Alert>
+      </Snackbar>
 
         {/* 导出对话框 */}
         <Dialog
