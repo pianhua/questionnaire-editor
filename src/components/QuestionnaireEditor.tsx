@@ -34,8 +34,6 @@ import {
   Tooltip,
   Alert,
   Snackbar,
-  BottomNavigation,
-  BottomNavigationAction,
   Drawer,
   List,
   ListItem,
@@ -76,7 +74,6 @@ import { StorageService } from '../services/storageService';
 import { validateQuestionnaireTitle } from '../utils/validation';
 
 type EditorView = 'questions' | 'settings' | 'preview' | 'publish' | 'analysis' | 'form';
-type MobileNavValue = 'questions' | 'preview' | 'form' | 'settings' | 'ai';
 const storageService = new StorageService();
 
 const QuestionnaireEditor: React.FC = () => {
@@ -185,28 +182,12 @@ const QuestionnaireEditor: React.FC = () => {
     setMobileOpen(false);
   }, []);
 
-  const handleMobileBottomNavChange = useCallback((value: MobileNavValue) => {
-    if (value === 'ai') {
-      setShowAIPanel(true);
-      return;
-    }
-
-    setCurrentView(value);
-  }, []);
-
   // 使用 useMemo 优化 editingQuestion 计算
   const editingQuestion = useMemo(() => {
     return editingQuestionId
       ? currentQuestionnaire.questions.find((q) => q.id === editingQuestionId)
       : null;
   }, [editingQuestionId, currentQuestionnaire.questions]);
-
-  const currentMobileNavValue = useMemo<MobileNavValue>(() => {
-    if (currentView === 'preview' || currentView === 'form' || currentView === 'settings') {
-      return currentView;
-    }
-    return 'questions';
-  }, [currentView]);
 
   useEffect(() => {
     if (editingQuestionId && editorRef.current) {
@@ -791,7 +772,7 @@ const QuestionnaireEditor: React.FC = () => {
 
         <Box sx={{ 
         p: { xs: 2, md: 3 },
-        pb: { xs: 10, md: 3 },
+        pb: { xs: 2, md: 3 },
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
@@ -840,34 +821,6 @@ const QuestionnaireEditor: React.FC = () => {
 
         {renderContent()}
       </Box>
-
-      {isMobile && !editingQuestion && (
-        <Paper
-          elevation={8}
-          sx={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            zIndex: 1200,
-            pb: 'env(safe-area-inset-bottom)',
-          }}
-        >
-          <BottomNavigation
-            showLabels
-            value={currentMobileNavValue}
-            onChange={(_, value: MobileNavValue) => handleMobileBottomNavChange(value)}
-          >
-            <BottomNavigationAction label="编辑" value="questions" icon={<AddIcon />} />
-            <BottomNavigationAction label="预览" value="preview" icon={<PreviewIcon />} />
-            <BottomNavigationAction label="填写" value="form" icon={<EditIcon />} />
-            <BottomNavigationAction label="AI" value="ai" icon={<AIIcon />} />
-            <BottomNavigationAction label="设置" value="settings" icon={<SettingsIcon />} />
-          </BottomNavigation>
-        </Paper>
-      )}
 
         <Dialog
           open={showQuestionTypeSelector}
